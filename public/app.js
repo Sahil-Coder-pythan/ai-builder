@@ -152,6 +152,13 @@ function addMessage(role, content, save = true) {
   wrap.className = "message " + role;
   if (role === "assistant") {
     wrap.innerHTML = renderAssistantHtml(content);
+    // Append a Speak button (free, uses browser TTS with subtle modulation)
+    const speakBtn = document.createElement("button");
+    speakBtn.className = "msg-speak";
+    speakBtn.type = "button";
+    speakBtn.innerHTML = '<span class="mic-ico">🔊</span> Speak';
+    speakBtn.dataset.text = content;
+    wrap.appendChild(speakBtn);
   } else {
     wrap.textContent = content;
   }
@@ -325,6 +332,70 @@ function speak(text) {
   speechSynthesis.speak(u);
 }
 
+// Play text using browser SpeechSynthesis but add a mild "vibe" by splitting into chunks
+// and modulating pitch slightly on each chunk. This gives a subtle vibrato-like effect
+// without any paid TTS service.
+function playTextWithVibe(fullText, btnEl) {
+  if (!window.speechSynthesis) return speak(fullText);
+  // Split into small chunks (sentences or ~120 chars)
+  const chunks = [];
+  const sents = fullText.split(/(?<=[.!?])\s+/);
+  for (const s of sents) {
+    if (!s) continue;
+    if (s.length <= 120) chunks.push(s);
+    else {
+      // split long sentence into ~120 char parts
+      for (let i = 0; i < s.length; i += 120) chunks.push(s.slice(i, i + 120));
+    }
+  }
+  if (!chunks.length) chunks.push(fullText);
+
+  let i = 0;
+  const basePitch = 1.0;
+  const depth = 0.06; // vibrato depth
+  const freq = 5.0; // Hz-ish feel (per chunk modulation)
+
+  function speakChunk() {
+    if (i >= chunks.length) {
+      if (btnEl) btnEl.classList.remove('playing');
+      return;
+    }
+    const t = chunks[i];
+    const u = new SpeechSynthesisUtterance(t.replace(/[#*_`]/g, " "));
+    // choose voice if available
+    if (voices.length && $("#optVoice")) {
+      const v = voices[$("#optVoice").selectedIndex];
+      if (v) u.voice = v;
+    } else if (aiSettings && aiSettings.voiceName) {
+      const v = voices.find((x) => x.name === aiSettings.voiceName);
+      if (v) u.voice = v;
+    }
+    // Modulate pitch slightly per chunk to simulate vibrato
+    const phase = i;
+    const mod = Math.sin(phase * 2 * Math.PI * (freq / Math.max(1, chunks.length))) * depth;
+    u.pitch = Math.max(0.5, Math.min(2.0, basePitch + mod));
+    u.rate = 1.0;
+    u.onend = () => {
+      i += 1;
+      // small gap to feel natural
+      setTimeout(speakChunk, 80);
+    };
+    window.speechSynthesis.speak(u);
+  }
+
+  if (btnEl) btnEl.classList.add('playing');
+  speakChunk();
+}
+
+// Delegate clicks on dynamically added speak buttons
+document.addEventListener('click', (ev) => {
+  const btn = ev.target.closest && ev.target.closest('.msg-speak');
+  if (!btn) return;
+  const text = btn.dataset.text || '';
+  if (!text) return;
+  playTextWithVibe(text, btn);
+});
+
 function applyTheme() {
   const body = $("#chatBody") || document.body;
   body.classList.remove("theme-dark", "theme-blue", "theme-purple", "theme-green");
@@ -471,7 +542,7 @@ if ($("#chatForm") && slug) {
     aiSettings = {
       theme: $("#optTheme").value,
       voiceName,
-      shareCreatorDetails: $("#optShareCreator").checked,
+      share_creator_details: $("#optShareCreator").checked,
       showCreatorBadge: $("#optShowCreatorBadge").checked,
       autoSpeak: $("#optAutoSpeak").checked,
       enterSend: $("#optEnterSend").checked,
@@ -489,7 +560,7 @@ if ($("#chatForm") && slug) {
     $("#aiSettingsModal").classList.add("hidden");
     toast("AI Settings सेव!");
   };
-  $("#previewVoiceBtn").onclick = () => speak("नमस्ते! यह voice preview है। Hello, this is a voice preview.");
+  $("#previewVoiceBtn").onclick = () => playTextWithVibe("नमस्ते! यह voice preview है। Hello, this is a voice preview.");
   $("#downloadDbBtn").onclick = () => {
     const blob = new Blob(
       [JSON.stringify(loadLocal("database", { chats }), null, 2)],
@@ -646,7 +717,7 @@ if ($("#chatForm") && slug) {
       });
       waiting.remove();
       addMessage("assistant", data.answer);
-      if (aiSettings?.autoSpeak) speak(data.answer);
+      if (aiSettings?.autoSpeak) playTextWithVibe(data.answer);
     } catch (err) {
       waiting.remove();
       addMessage("assistant", "⚠ " + err.message);
