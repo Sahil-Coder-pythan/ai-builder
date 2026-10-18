@@ -6,6 +6,32 @@
   <meta name="theme-color" content="#1a73e8">
   <title>GyanAI</title>
   <link rel="stylesheet" href="/public/style.css">
+  <style>
+    /* यह इनलाइन CSS है जो ब्राउज़र में तुरंत लागू होगा */
+    .chat-body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh; /* मोबाइल के लिए सबसे सही */
+      margin: 0;
+      overflow: hidden;
+      background: #f7f9fc;
+    }
+    .chat-main {
+      flex: 1;
+      overflow-y: auto; /* सिर्फ मैसेज स्क्रॉल होंगे */
+      padding-bottom: 20px;
+    }
+    .composer-wrap {
+      width: 100%;
+      background: #f7f9fc;
+      padding: 10px;
+      box-sizing: border-box;
+      /* यह सुनिश्चित करेगा कि बॉक्स नीचे ही रहे */
+      flex-shrink: 0; 
+      z-index: 9999;
+    }
+  </style>
 </head>
 <body class="chat-body">
 
@@ -73,11 +99,14 @@
     <section id="messages" class="messages"></section>
   </main>
 
-  <!-- FIXED Message Box at bottom - ALWAYS visible -->
+  <!-- FIXED Message Box at bottom -->
   <div class="composer-wrap">
-    <form id="chatForm" class="composer">
-      <textarea id="messageInput" rows="1" placeholder="यहाँ मैसेज लिखें..." maxlength="6000"></textarea>
-      <button type="submit" class="send-btn" id="sendBtn" aria-label="भेजें">➤</button>
+    <form id="chatForm" class="composer" style="display: flex; align-items: center; background: #fff; border: 1px solid #ccc; border-radius: 25px; padding: 5px 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+      
+      <textarea id="messageInput" rows="1" placeholder="यहाँ मैसेज लिखें..." maxlength="6000" style="flex: 1; border: none; outline: none; resize: none; padding: 10px 0; font-size: 16px; max-height: 100px; background: transparent;"></textarea>
+      
+      <button type="submit" id="sendBtn" aria-label="भेजें" style="background: #1a73e8; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin-left: 10px;">➤</button>
+      
     </form>
   </div>
 
@@ -96,4 +125,4 @@
 
   <script src="/public/app.js"></script>
 </body>
-  </html>
+          </html>
