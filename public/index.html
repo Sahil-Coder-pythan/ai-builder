@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>AI Builder — अपना AI बनाएं</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="landing-body">
+  <main class="landing">
+    <section class="landing-card hero-card" id="createCard">
+      <div class="logo-big"><span class="spark">✦</span><span>AI <span class="blue">Builder</span></span></div>
+      <div class="eyebrow">YOUR IDEAS. YOUR AI.</div>
+      <h1>अपना AI बनाइए। अपनी पहचान के साथ।</h1>
+      <p class="sub">अपना पर्सनल AI बनाएं, अपना मॉडल कनेक्ट करें और एक अलग लिंक शेयर करें।</p>
+      <div class="feature-pills"><span>✦ अपना AI लिंक</span><span>🔒 अलग चैट हिस्ट्री</span><span>⚡ अपना मॉडल</span></div>
+      <button type="button" class="btn-primary" id="startCreateBtn">Generate your AI <span>→</span></button>
+      <p class="tiny hero-note">शुरू करने में बस एक मिनट लगेगा।</p>
+      <form id="createForm" class="details-form hidden" autocomplete="off">
+        <div class="form-heading"><span>01 / YOUR AI</span><h2>अपने AI की डिटेल भरें</h2><p>इनसे आपके AI की पहचान बनेगी।</p></div>
+        <label class="field-label" for="usernameInput">Username</label>
+        <input type="text" id="usernameInput" name="username" required placeholder="जैसे Ramesh" maxlength="80" autocomplete="nickname">
+        <label class="field-label" for="emailInput">ईमेल ID</label>
+        <input type="text" id="emailInput" name="email" required placeholder="you@gmail.com" maxlength="160" autocomplete="email" inputmode="email">
+        <label class="field-label" for="phoneInput">मोबाइल नंबर</label>
+        <input type="tel" id="phoneInput" name="phone" required placeholder="अपना मोबाइल नंबर" maxlength="30" autocomplete="tel">
+        <label class="field-label" for="addressInput">Address / जगह</label>
+        <input type="text" id="addressInput" name="address" required placeholder="जैसे Kashipur, Uttarakhand" maxlength="240" autocomplete="street-address">
+        <button type="submit" class="btn-primary" id="createBtn">Generate your AI ✦</button>
+      </form>
+      <div id="formStatus" class="status" role="status"></div>
+    </section>
+    <section class="landing-card hidden" id="successCard">
+      <div class="success-icon">✓</div>
+      <div class="eyebrow">READY TO GO</div>
+      <h1>आपका AI तैयार है!</h1>
+      <p class="sub">आपका अलग AI लिंक बन गया है। इसे सेव करें और अपने AI से बात शुरू करें।</p>
+      <div class="link-box"><a id="aiLink" href="#" target="_blank" rel="noopener" class="ai-link"></a></div>
+      <div class="btn-row">
+        <button type="button" class="btn-secondary" id="copyBtn">लिंक कॉपी करें</button>
+        <a id="openBtn" href="#" class="btn-primary" target="_blank" rel="noopener">AI खोलें →</a>
+      </div>
+      <p class="tiny">लिंक किसी भरोसेमंद व्यक्ति के साथ ही शेयर करें। फिलहाल ईमेल सत्यापन चालू नहीं है।</p>
+    </section>
+  </main>
+  <script src="/public/app.js"></script>
+</body>
+</html>
