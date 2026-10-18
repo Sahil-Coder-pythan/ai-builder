@@ -147,12 +147,11 @@ button{cursor:pointer;border:none;background:none}
 
 /* ========== CHAT PAGE ========== */
 .chat-body{
-  height:100dvh;
-  height:100vh;
+  height:100dvh; /* Dynamic viewport height for mobile */
   display:flex;
   flex-direction:column;
   background:#f7f9fc;
-  overflow:hidden;
+  overflow:hidden; 
 }
 .chat-top{
   height:56px;
@@ -404,6 +403,8 @@ button{cursor:pointer;border:none;background:none}
   padding:8px 10px;
   padding-bottom:max(10px, env(safe-area-inset-bottom, 10px));
   background:#f7f9fc;
+  position: relative;
+  z-index: 50;
 }
 .composer{
   width:100%;
