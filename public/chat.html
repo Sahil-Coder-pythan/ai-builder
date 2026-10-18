@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#1a73e8">
+  <title>GyanAI</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="chat-body">
+
+  <!-- Left Drawer -->
+  <aside id="drawer" class="drawer">
+    <div class="drawer-head">
+      <strong>☰ मेन्यू</strong>
+      <button id="closeDrawer" class="icon-btn">✕</button>
+    </div>
+
+    <button id="newChatBtn" class="menu-item">＋ नई चैट</button>
+
+    <div class="drawer-label">हाल की चैट</div>
+    <div id="historyList"></div>
+
+    <!-- Owner Settings -->
+    <div id="ownerSettings" class="owner-settings hidden">
+      <div class="drawer-label">⚙ API सेटिंग्स</div>
+      <div class="settings-box">
+        <label>Base URL</label>
+        <input type="text" id="setUrl" placeholder="https://api.groq.com/openai/v1" autocomplete="off">
+        <div id="urlSuggest" class="suggest-list"></div>
+
+        <label>Model</label>
+        <input type="text" id="setModel" placeholder="llama-3.3-70b-versatile" autocomplete="off">
+        <div id="modelSuggest" class="suggest-list"></div>
+
+        <label>API Key</label>
+        <input type="password" id="setKey" placeholder="gsk_... या sk-..." autocomplete="off">
+
+        <div class="set-btns">
+          <button type="button" id="testBtn" class="btn-secondary small">टेस्ट</button>
+          <button type="button" id="saveSettingsBtn" class="btn-primary small">सेव करें</button>
+        </div>
+        <div id="settingsStatus" class="status small"></div>
+        <p class="hint-tiny">OpenAI-compatible किसी भी API से चलता है (Groq, OpenAI, Grok, Together…)</p>
+      </div>
+    </div>
+  </aside>
+  <div id="shade" class="shade hidden"></div>
+
+  <!-- Top Bar -->
+  <header class="chat-top">
+    <button id="openDrawer" class="icon-btn" aria-label="मेन्यू">☰</button>
+    <div class="brand">
+      <span class="spark">✦</span>
+      <span>Gyan<span class="blue">AI</span></span>
+    </div>
+    <button id="moreBtn" class="icon-btn" aria-label="विकल्प">⋮</button>
+    <div id="moreMenu" class="more-menu hidden">
+      <button id="shareBtn">AI लिंक कॉपी करें</button>
+      <button id="historyMenuBtn">चैट हिस्ट्री</button>
+    </div>
+  </header>
+
+  <!-- Main Chat Area -->
+  <main class="chat-main" id="chatMain">
+    <section id="welcomeCard" class="chat-welcome">
+      <h1>नमस्कार! 👋</h1>
+      <p>आज मैं आपकी कैसे मदद कर सकता हूँ?</p>
+      <div class="creator-line">
+        निर्माता: <strong id="creatorName">—</strong>
+      </div>
+    </section>
+    <section id="messages" class="messages"></section>
+  </main>
+
+  <!-- FIXED Message Box at bottom - ALWAYS visible -->
+  <div class="composer-wrap">
+    <form id="chatForm" class="composer">
+      <textarea id="messageInput" rows="1" placeholder="यहाँ मैसेज लिखें..." maxlength="6000"></textarea>
+      <button type="submit" class="send-btn" id="sendBtn" aria-label="भेजें">➤</button>
+    </form>
+  </div>
+
+  <!-- Custom Confirm Modal -->
+  <div id="confirmModal" class="confirm-overlay hidden">
+    <div class="confirm-box">
+      <p id="confirmText">यह चैट डिलीट करें?</p>
+      <div class="confirm-btns">
+        <button type="button" id="confirmCancel" class="btn-secondary small">रद्द करें</button>
+        <button type="button" id="confirmOk" class="btn-danger small">डिलीट करें</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="/public/app.js"></script>
+</body>
+</html>
