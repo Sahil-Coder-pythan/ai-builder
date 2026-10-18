@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0878ed"><title>GyanAI Builder</title>
+<link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="home-body">
+<header class="topbar"><div class="brand"><span class="spark">✦</span><span>Gyan<span class="blue">AI</span></span></div><div class="avatar">AI</div></header>
+<main class="home-wrap">
+<section class="welcome"><h1>अपना AI बनाएं <span>👋</span></h1><p>अपनी जानकारी और API सेटिंग जोड़ें। आपका AI लिंक तैयार हो जाएगा।</p></section>
+<section class="panel">
+<h2>✨ AI बनाने की जानकारी</h2>
+<form id="createForm">
+<label>आपका नाम<input name="name" required maxlength="80" placeholder="जैसे: राहुल शर्मा"></label>
+<div class="two"><label>Gmail / ईमेल<input name="email" type="email" required placeholder="you@gmail.com"></label><label>फोन नंबर<input name="phone" type="tel" required maxlength="25" placeholder="आपका फोन नंबर"></label></div>
+<label>आपका AI क्या काम करेगा?<textarea name="purpose" required maxlength="1200" rows="3" placeholder="जैसे: पढ़ाई, टेक्नोलॉजी, कोडिंग में मदद करना"></textarea></label>
+<h2 class="section-heading">🔌 अपनी API कनेक्ट करें</h2>
+<label>Base URL<input name="base_url" required type="url" placeholder="https://api.groq.com/openai/v1"></label>
+<label>Model Name<input name="model" required placeholder="जैसे: openai/gpt-oss-20b"></label>
+<label>API Key<input name="api_key" required type="password" autocomplete="off" placeholder="अपनी API key यहाँ डालें"></label>
+<p class="hint">API Key सर्वर पर एन्क्रिप्ट होकर सेव होगी। इसे GitHub पर कभी न डालें।</p>
+<button class="primary full" id="createBtn">मेरा AI बनाएं <span>→</span></button>
+<div id="formStatus" class="status" role="status"></div>
+</form>
+</section>
+<footer>GyanAI Builder · अपना AI, अपना लिंक</footer>
+</main>
+<script src="/public/app.js"></script>
+</body></html>
