@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#1a73e8">
+  <title>AI Chat</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="chat-body" id="chatBody">
+
+  <aside id="drawer" class="drawer">
+    <div class="drawer-head">
+      <strong>☰ मेन्यू</strong>
+      <button type="button" id="closeDrawer" class="icon-btn">✕</button>
+    </div>
+    <button type="button" id="newChatBtn" class="menu-item">＋ नई चैट</button>
+    <div class="drawer-label">इस डिवाइस की चैट</div>
+    <div id="historyList"></div>
+
+    <div class="drawer-label">⚙ API Settings</div>
+    <div class="settings-box">
+      <label>Base URL</label>
+      <input type="text" id="setUrl" placeholder="https://api.groq.com/openai/v1" autocomplete="off">
+      <div id="urlSuggest" class="suggest-list"></div>
+      <label>Model</label>
+      <input type="text" id="setModel" placeholder="llama-3.1-8b-instant" autocomplete="off">
+      <div id="modelSuggest" class="suggest-list"></div>
+      <label>API Key</label>
+      <input type="password" id="setKey" placeholder="gsk_... / sk-..." autocomplete="off">
+      <div class="set-btns">
+        <button type="button" id="testBtn" class="btn-secondary small">टेस्ट</button>
+        <button type="button" id="saveApiBtn" class="btn-primary small">सेव / कनेक्ट</button>
+      </div>
+      <div id="apiStatus" class="status small"></div>
+      <p class="hint-tiny">API Key सिर्फ इस डिवाइस पर सेव होती है। कोई और mobile आपकी history नहीं देखेगा।</p>
+    </div>
+  </aside>
+  <div id="shade" class="shade hidden"></div>
+
+  <header class="chat-top">
+    <button type="button" id="openDrawer" class="icon-btn">☰</button>
+    <div class="brand"><span class="spark">✦</span> <span id="brandName">AI</span></div>
+    <button type="button" id="moreBtn" class="icon-btn">⋮</button>
+    <div id="moreMenu" class="more-menu hidden">
+      <button type="button" id="aiSettingsBtn">AI Settings</button>
+      <button type="button" id="shareBtn">लिंक कॉपी</button>
+      <button type="button" id="exportHistoryBtn">History Export</button>
+      <button type="button" id="clearLocalHistoryBtn">इस डिवाइस की history मिटाएँ</button>
+    </div>
+  </header>
+
+  <main class="chat-main" id="chatMain">
+    <section id="welcomeCard" class="chat-welcome">
+      <h1>नमस्कार! 👋</h1>
+      <p>आज मैं आपकी कैसे मदद कर सकता हूँ?</p>
+      <div class="creator-line">निर्माता: <strong id="creatorName">—</strong></div>
+    </section>
+    <section id="messages" class="messages"></section>
+  </main>
+
+  <div class="composer-wrap">
+    <form id="chatForm" class="composer" autocomplete="off">
+      <button type="button" id="voiceBtn" class="voice-btn" title="Voice">🎤</button>
+      <textarea id="messageInput" rows="1" placeholder="मैसेज लिखें..." maxlength="8000"></textarea>
+      <button type="submit" class="send-btn" id="sendBtn">➤</button>
+    </form>
+  </div>
+
+  <!-- AI Settings Modal (~20 options) -->
+  <div id="aiSettingsModal" class="modal-overlay hidden">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2>AI Settings</h2>
+        <button type="button" class="icon-btn" id="closeAiSettings">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="opt-group">
+          <h3>Theme</h3>
+          <select id="optTheme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="blue">Ocean Blue</option>
+            <option value="purple">Purple</option>
+            <option value="green">Forest</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <h3>Voice</h3>
+          <select id="optVoice"></select>
+          <button type="button" class="btn-secondary small" id="previewVoiceBtn" style="margin-top:8px;width:100%">Voice Preview</button>
+        </div>
+        <div class="opt-group">
+          <h3>Privacy</h3>
+          <label class="switch-row"><span>Creator details share (username/address/date)</span>
+            <input type="checkbox" id="optShareCreator" checked></label>
+          <label class="switch-row"><span>Show creator name on home</span>
+            <input type="checkbox" id="optShowCreatorBadge" checked></label>
+        </div>
+        <div class="opt-group">
+          <h3>Chat</h3>
+          <label class="switch-row"><span>Auto-speak AI replies</span>
+            <input type="checkbox" id="optAutoSpeak"></label>
+          <label class="switch-row"><span>Send with Enter key</span>
+            <input type="checkbox" id="optEnterSend" checked></label>
+          <label class="switch-row"><span>Show timestamps</span>
+            <input type="checkbox" id="optTimestamps"></label>
+          <label class="switch-row"><span>Compact messages</span>
+            <input type="checkbox" id="optCompact"></label>
+        </div>
+        <div class="opt-group">
+          <h3>Response style</h3>
+          <select id="optStyle">
+            <option value="fun">Fun + Emoji</option>
+            <option value="pro">Professional</option>
+            <option value="short">Short answers</option>
+            <option value="detailed">Detailed</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <h3>Font size</h3>
+          <select id="optFont">
+            <option value="sm">Small</option>
+            <option value="md" selected>Medium</option>
+            <option value="lg">Large</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <h3>Language preference</h3>
+          <select id="optLang">
+            <option value="auto">Auto (user language)</option>
+            <option value="hi">Hindi prefer</option>
+            <option value="en">English prefer</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <h3>Sound</h3>
+          <label class="switch-row"><span>Send sound</span>
+            <input type="checkbox" id="optSendSound"></label>
+          <label class="switch-row"><span>Receive sound</span>
+            <input type="checkbox" id="optRecvSound"></label>
+        </div>
+        <div class="opt-group">
+          <h3>Data</h3>
+          <label class="switch-row"><span>Save history on this device</span>
+            <input type="checkbox" id="optSaveHistory" checked></label>
+          <button type="button" class="btn-secondary small" id="downloadDbBtn" style="width:100%;margin-top:8px">Download database.json</button>
+        </div>
+        <button type="button" class="btn-primary" id="saveAiSettingsBtn" style="margin-top:12px">सेव करें</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="/public/app.js"></script>
+</body>
+</html>
