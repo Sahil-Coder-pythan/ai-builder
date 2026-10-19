@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="theme-color" content="#1a73e8">
+  <title>GyanAI — अपना AI बनाएं</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="landing-body">
+
+  <!-- ========== STEP 1: Google-like Email ========== -->
+  <div class="landing" id="step1">
+    <div class="google-card">
+      <div class="google-logo">
+        <span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span>
+      </div>
+      <h1 class="google-title">Sign in</h1>
+      <p class="google-sub">Use your Google Account</p>
+
+      <form id="emailForm" autocomplete="off">
+        <div class="google-input-wrap">
+          <input type="email" id="emailInput" name="email" required
+                 placeholder="Email or phone" maxlength="160" autofocus>
+        </div>
+        <div class="google-links">
+          <a href="#" class="forgot-link" onclick="return false;">Forgot email?</a>
+        </div>
+        <p class="google-guest">Not your computer? Use Guest mode to sign in privately.</p>
+        <div class="google-actions">
+          <a href="#" class="create-account" onclick="return false;">Create account</a>
+          <button type="submit" class="btn-google-next" id="emailNextBtn">Next</button>
+        </div>
+      </form>
+      <div id="emailStatus" class="status"></div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 2: Details Form (Email, Mobile, Username, Address) ========== -->
+  <div class="landing hidden" id="step2">
+    <div class="landing-card details-card">
+      <div class="logo-big">
+        <span class="spark">✦</span>
+        <span>Gyan<span class="blue">AI</span></span>
+      </div>
+      <h1>अपना AI बनाएं</h1>
+      <p class="sub">नीचे दी गई जानकारी भरें।</p>
+
+      <form id="detailsForm" autocomplete="off">
+        <label class="field-label">Gmail ID</label>
+        <input type="email" id="detailEmail" name="email" required
+               placeholder="you@gmail.com" maxlength="160">
+
+        <label class="field-label">मोबाइल नंबर</label>
+        <input type="tel" id="detailPhone" name="phone" required
+               placeholder="+91 98765 43210" maxlength="20">
+
+        <label class="field-label">Username</label>
+        <input type="text" id="detailUsername" name="username" required
+               placeholder="अपना नाम / username" maxlength="80">
+
+        <label class="field-label">Address</label>
+        <input type="text" id="detailAddress" name="address" required
+               placeholder="शहर / पूरा पता" maxlength="200">
+
+        <button type="submit" class="btn-primary" id="detailsBtn">
+          Done →
+        </button>
+      </form>
+      <div id="detailsStatus" class="status"></div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 3: Search Box (Create Your AI model) ========== -->
+  <div class="landing hidden" id="step3">
+    <div class="search-page">
+      <div class="search-logo">
+        <span class="spark">✦</span>
+        <span>Gyan<span class="blue">AI</span></span>
+      </div>
+      <p class="search-hint">यहाँ लिखें और Enter दबाएँ</p>
+      <form id="searchForm" class="search-form" autocomplete="off">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Create Your AI model"
+                 maxlength="80" autofocus>
+          <button type="submit" class="search-go" id="searchBtn" aria-label="Create">➤</button>
+        </div>
+      </form>
+      <div id="searchStatus" class="status"></div>
+
+      <!-- Thinking state -->
+      <div id="thinkingBox" class="thinking-box hidden">
+        <div class="spinner"></div>
+        <p>AI model generate हो रहा है…</p>
+        <p class="tiny">कृपया प्रतीक्षा करें</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 4: Success ========== -->
+  <div class="landing hidden" id="step4">
+    <div class="landing-card">
+      <div class="success-icon">✓</div>
+      <h1>आपका AI तैयार है!</h1>
+      <p class="sub">नीचे दिए लिंक पर क्लिक करें। पूरा AI खुल जाएगा।</p>
+
+      <div class="link-box">
+        <a id="aiLink" href="#" target="_blank" rel="noopener" class="ai-link"></a>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn-secondary" id="copyBtn">लिंक कॉपी करें</button>
+        <a id="openBtn" href="#" class="btn-primary" target="_blank" rel="noopener">AI खोलें →</a>
+      </div>
+      <p class="tiny">लिंक सुरक्षित रखें। इसी से आपका AI खुलेगा।</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/public/app.js"></script>
+</body>
+</html>
