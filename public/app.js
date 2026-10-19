@@ -152,7 +152,6 @@ function addMessage(role, content, save = true) {
   wrap.className = "message " + role;
   if (role === "assistant") {
     wrap.innerHTML = renderAssistantHtml(content);
-    // Append a Speak button (free, uses browser TTS with subtle modulation)
     const speakBtn = document.createElement("button");
     speakBtn.className = "msg-speak";
     speakBtn.type = "button";
@@ -182,7 +181,6 @@ function addMessage(role, content, save = true) {
 function persistChats() {
   if (aiSettings && aiSettings.saveHistory === false) return;
   saveLocal("chats", chats);
-  // Also offer implicit "database" blob
   saveLocal("database", {
     version: 1,
     device: deviceId(),
@@ -290,7 +288,6 @@ function loadVoices() {
   voices = speechSynthesis.getVoices() || [];
   const sel = $("#optVoice");
   if (!sel) return;
-  // Prefer Microsoft / Google / high quality
   const ranked = [...voices].sort((a, b) => {
     const score = (v) => {
       let s = 0;
@@ -332,19 +329,14 @@ function speak(text) {
   speechSynthesis.speak(u);
 }
 
-// Play text using browser SpeechSynthesis but add a mild "vibe" by splitting into chunks
-// and modulating pitch slightly on each chunk. This gives a subtle vibrato-like effect
-// without any paid TTS service.
 function playTextWithVibe(fullText, btnEl) {
   if (!window.speechSynthesis) return speak(fullText);
-  // Split into small chunks (sentences or ~120 chars)
   const chunks = [];
   const sents = fullText.split(/(?<=[.!?])\s+/);
   for (const s of sents) {
     if (!s) continue;
     if (s.length <= 120) chunks.push(s);
     else {
-      // split long sentence into ~120 char parts
       for (let i = 0; i < s.length; i += 120) chunks.push(s.slice(i, i + 120));
     }
   }
@@ -352,8 +344,8 @@ function playTextWithVibe(fullText, btnEl) {
 
   let i = 0;
   const basePitch = 1.0;
-  const depth = 0.06; // vibrato depth
-  const freq = 5.0; // Hz-ish feel (per chunk modulation)
+  const depth = 0.06;
+  const freq = 5.0;
 
   function speakChunk() {
     if (i >= chunks.length) {
@@ -362,7 +354,6 @@ function playTextWithVibe(fullText, btnEl) {
     }
     const t = chunks[i];
     const u = new SpeechSynthesisUtterance(t.replace(/[#*_`]/g, " "));
-    // choose voice if available
     if (voices.length && $("#optVoice")) {
       const v = voices[$("#optVoice").selectedIndex];
       if (v) u.voice = v;
@@ -370,14 +361,12 @@ function playTextWithVibe(fullText, btnEl) {
       const v = voices.find((x) => x.name === aiSettings.voiceName);
       if (v) u.voice = v;
     }
-    // Modulate pitch slightly per chunk to simulate vibrato
     const phase = i;
     const mod = Math.sin(phase * 2 * Math.PI * (freq / Math.max(1, chunks.length))) * depth;
     u.pitch = Math.max(0.5, Math.min(2.0, basePitch + mod));
     u.rate = 1.0;
     u.onend = () => {
       i += 1;
-      // small gap to feel natural
       setTimeout(speakChunk, 80);
     };
     window.speechSynthesis.speak(u);
@@ -387,7 +376,6 @@ function playTextWithVibe(fullText, btnEl) {
   speakChunk();
 }
 
-// Delegate clicks on dynamically added speak buttons
 document.addEventListener('click', (ev) => {
   const btn = ev.target.closest && ev.target.closest('.msg-speak');
   if (!btn) return;
@@ -438,13 +426,11 @@ if ($("#chatForm") && slug) {
   apiConfig = loadLocal("api", { url: "", model: "", key: "" });
   chats = loadLocal("chats", []);
 
-  // Prefill API fields
   if (apiConfig.url) $("#setUrl").value = apiConfig.url;
   if (apiConfig.model) $("#setModel").value = apiConfig.model;
 
   applyTheme();
 
-  // Catalog for fast connect
   (async () => {
     try {
       const cat = await jsonFetch("/api/catalog");
@@ -515,7 +501,6 @@ if ($("#chatForm") && slug) {
     toast("database.json डाउनलोड");
   };
 
-  // AI Settings modal
   $("#aiSettingsBtn").onclick = () => {
     $("#moreMenu").classList.add("hidden");
     const s = aiSettings || defaultSettings();
@@ -542,7 +527,7 @@ if ($("#chatForm") && slug) {
     aiSettings = {
       theme: $("#optTheme").value,
       voiceName,
-      share_creator_details: $("#optShareCreator").checked,
+      shareCreatorDetails: $("#optShareCreator").checked,
       showCreatorBadge: $("#optShowCreatorBadge").checked,
       autoSpeak: $("#optAutoSpeak").checked,
       enterSend: $("#optEnterSend").checked,
@@ -572,7 +557,6 @@ if ($("#chatForm") && slug) {
     a.click();
   };
 
-  // API save / test — local first for privacy + speed
   $("#saveApiBtn").onclick = async () => {
     const url = $("#setUrl").value.trim();
     const model = $("#setModel").value.trim();
@@ -583,7 +567,6 @@ if ($("#chatForm") && slug) {
       status.textContent = "URL, Model और Key सभी भरें।";
       return;
     }
-    // Fuzzy match known lists (fast path)
     const urlOk = ALL_URLS.some((u) => url.includes(u.replace(/\/v1$/, "")) || u.includes(url.replace(/\/+$/, "")));
     const modelOk = ALL_MODELS.some(
       (m) => m.toLowerCase() === model.toLowerCase() || m.toLowerCase().includes(model.toLowerCase()) || model.toLowerCase().includes(m.toLowerCase())
@@ -593,14 +576,12 @@ if ($("#chatForm") && slug) {
     status.className = "status small";
     status.textContent = urlOk || modelOk ? "मैच मिला — कनेक्ट टेस्ट…" : "टेस्ट हो रहा है…";
     try {
-      // Quick test
       await jsonFetch("/api/test/" + slug, {
         method: "POST",
         body: JSON.stringify({ base_url: url, model, api_key: key }),
       });
       apiConfig = { url, model, key };
       saveLocal("api", apiConfig);
-      // Also try server save (optional)
       try {
         await jsonFetch("/api/settings/" + slug, {
           method: "POST",
@@ -641,7 +622,6 @@ if ($("#chatForm") && slug) {
     }
   };
 
-  // Voice input
   let recognizing = false;
   let recognition = null;
   if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
@@ -660,7 +640,6 @@ if ($("#chatForm") && slug) {
   }
   $("#voiceBtn").onclick = () => {
     if (!recognition) {
-      // fallback: speak last answer
       const last = [...document.querySelectorAll(".message.assistant")].pop();
       if (last) speak(last.textContent);
       else toast("Voice input इस ब्राउज़र में उपलब्ध नहीं");
@@ -675,7 +654,6 @@ if ($("#chatForm") && slug) {
     recognition.start();
   };
 
-  // Send message
   async function sendCurrent() {
     const input = $("#messageInput");
     const message = input.value.trim();
@@ -696,7 +674,7 @@ if ($("#chatForm") && slug) {
     const chat = chats.find((c) => c.id === currentChatId);
     const history = (chat?.messages || [])
       .filter((m) => m.role === "user" || m.role === "assistant")
-      .slice(0, -1) // current user msg already pushed
+      .slice(0, -1)
       .slice(-16);
 
     try {
