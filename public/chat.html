@@ -59,11 +59,16 @@
     <section id="messages" class="messages"></section>
   </main>
 
+  <div id="voiceStatus" class="voice-status hidden">Connecting...</div>
   <div class="composer-wrap">
     <form id="chatForm" class="composer" autocomplete="off">
-      <button type="button" id="voiceBtn" class="voice-btn" title="Voice">🎤</button>
-      <textarea id="messageInput" rows="1" placeholder="मैसेज लिखें..." maxlength="8000"></textarea>
-      <button type="submit" class="send-btn" id="sendBtn">➤</button>
+      <button type="button" id="plusBtn" class="icon-round" title="More">＋</button>
+      <textarea id="messageInput" rows="1" placeholder="Ask anything..." maxlength="8000"></textarea>
+      <button type="button" id="micIconBtn" class="icon-round" title="Mic">🎤</button>
+      <button type="button" id="speakBtn" class="speak-btn" title="Speak">
+        <span class="speak-icon">||</span> Speak
+      </button>
+      <button type="submit" class="send-btn hidden" id="sendBtn">➤</button>
     </form>
   </div>
 

@@ -1,8 +1,12 @@
 [
+  "openai/gpt-oss-20b",
+  "openai/gpt-oss-120b",
+  "openai/gpt-oss-safeguard-20b",
   "llama-3.3-70b-versatile",
   "llama-3.1-8b-instant",
   "llama-3.1-70b-versatile",
-  "llama-3.2-90b-text-preview",
+  "qwen/qwen3.8-27b",
+  "qwen/qwen3.6-27b",
   "mixtral-8x7b-32768",
   "gemma2-9b-it",
   "gemma2-27b-it",
@@ -17,6 +21,7 @@
   "grok-2",
   "grok-2-latest",
   "grok-beta",
+  "grok-3",
   "deepseek-chat",
   "deepseek-reasoner",
   "mistral-large-latest",
@@ -31,5 +36,6 @@
   "qwen-plus",
   "qwen-turbo",
   "command-r-plus",
-  "command-r"
+  "command-r",
+  "allam-2-7b"
 ]

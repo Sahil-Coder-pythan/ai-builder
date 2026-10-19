@@ -152,12 +152,6 @@ function addMessage(role, content, save = true) {
   wrap.className = "message " + role;
   if (role === "assistant") {
     wrap.innerHTML = renderAssistantHtml(content);
-    const speakBtn = document.createElement("button");
-    speakBtn.className = "msg-speak";
-    speakBtn.type = "button";
-    speakBtn.innerHTML = '<span class="mic-ico">🔊</span> Speak';
-    speakBtn.dataset.text = content;
-    wrap.appendChild(speakBtn);
   } else {
     wrap.textContent = content;
   }
@@ -181,6 +175,7 @@ function addMessage(role, content, save = true) {
 function persistChats() {
   if (aiSettings && aiSettings.saveHistory === false) return;
   saveLocal("chats", chats);
+  // Also offer implicit "database" blob
   saveLocal("database", {
     version: 1,
     device: deviceId(),
@@ -288,6 +283,7 @@ function loadVoices() {
   voices = speechSynthesis.getVoices() || [];
   const sel = $("#optVoice");
   if (!sel) return;
+  // Prefer Microsoft / Google / high quality
   const ranked = [...voices].sort((a, b) => {
     const score = (v) => {
       let s = 0;
@@ -328,61 +324,6 @@ function speak(text) {
   u.rate = 1;
   speechSynthesis.speak(u);
 }
-
-function playTextWithVibe(fullText, btnEl) {
-  if (!window.speechSynthesis) return speak(fullText);
-  const chunks = [];
-  const sents = fullText.split(/(?<=[.!?])\s+/);
-  for (const s of sents) {
-    if (!s) continue;
-    if (s.length <= 120) chunks.push(s);
-    else {
-      for (let i = 0; i < s.length; i += 120) chunks.push(s.slice(i, i + 120));
-    }
-  }
-  if (!chunks.length) chunks.push(fullText);
-
-  let i = 0;
-  const basePitch = 1.0;
-  const depth = 0.06;
-  const freq = 5.0;
-
-  function speakChunk() {
-    if (i >= chunks.length) {
-      if (btnEl) btnEl.classList.remove('playing');
-      return;
-    }
-    const t = chunks[i];
-    const u = new SpeechSynthesisUtterance(t.replace(/[#*_`]/g, " "));
-    if (voices.length && $("#optVoice")) {
-      const v = voices[$("#optVoice").selectedIndex];
-      if (v) u.voice = v;
-    } else if (aiSettings && aiSettings.voiceName) {
-      const v = voices.find((x) => x.name === aiSettings.voiceName);
-      if (v) u.voice = v;
-    }
-    const phase = i;
-    const mod = Math.sin(phase * 2 * Math.PI * (freq / Math.max(1, chunks.length))) * depth;
-    u.pitch = Math.max(0.5, Math.min(2.0, basePitch + mod));
-    u.rate = 1.0;
-    u.onend = () => {
-      i += 1;
-      setTimeout(speakChunk, 80);
-    };
-    window.speechSynthesis.speak(u);
-  }
-
-  if (btnEl) btnEl.classList.add('playing');
-  speakChunk();
-}
-
-document.addEventListener('click', (ev) => {
-  const btn = ev.target.closest && ev.target.closest('.msg-speak');
-  if (!btn) return;
-  const text = btn.dataset.text || '';
-  if (!text) return;
-  playTextWithVibe(text, btn);
-});
 
 function applyTheme() {
   const body = $("#chatBody") || document.body;
@@ -426,11 +367,13 @@ if ($("#chatForm") && slug) {
   apiConfig = loadLocal("api", { url: "", model: "", key: "" });
   chats = loadLocal("chats", []);
 
+  // Prefill API fields
   if (apiConfig.url) $("#setUrl").value = apiConfig.url;
   if (apiConfig.model) $("#setModel").value = apiConfig.model;
 
   applyTheme();
 
+  // Catalog for fast connect
   (async () => {
     try {
       const cat = await jsonFetch("/api/catalog");
@@ -501,6 +444,7 @@ if ($("#chatForm") && slug) {
     toast("database.json डाउनलोड");
   };
 
+  // AI Settings modal
   $("#aiSettingsBtn").onclick = () => {
     $("#moreMenu").classList.add("hidden");
     const s = aiSettings || defaultSettings();
@@ -545,7 +489,7 @@ if ($("#chatForm") && slug) {
     $("#aiSettingsModal").classList.add("hidden");
     toast("AI Settings सेव!");
   };
-  $("#previewVoiceBtn").onclick = () => playTextWithVibe("नमस्ते! यह voice preview है। Hello, this is a voice preview.");
+  $("#previewVoiceBtn").onclick = () => speak("नमस्ते! यह voice preview है। Hello, this is a voice preview.");
   $("#downloadDbBtn").onclick = () => {
     const blob = new Blob(
       [JSON.stringify(loadLocal("database", { chats }), null, 2)],
@@ -557,6 +501,7 @@ if ($("#chatForm") && slug) {
     a.click();
   };
 
+  // API save / test — local first for privacy + speed
   $("#saveApiBtn").onclick = async () => {
     const url = $("#setUrl").value.trim();
     const model = $("#setModel").value.trim();
@@ -567,7 +512,8 @@ if ($("#chatForm") && slug) {
       status.textContent = "URL, Model और Key सभी भरें।";
       return;
     }
-    const urlOk = ALL_URLS.some((u) => url.includes(u.replace(/\/v1$/, "")) || u.includes(url.replace(/\/+$/, "")));
+    // Fuzzy match known lists (fast path)
+    const urlOk = ALL_URLS.some((u) => url.includes(u.replace(/\/v1$/, "")) || u.includes(url.replace(/\/+$", "")));
     const modelOk = ALL_MODELS.some(
       (m) => m.toLowerCase() === model.toLowerCase() || m.toLowerCase().includes(model.toLowerCase()) || model.toLowerCase().includes(m.toLowerCase())
     );
@@ -576,12 +522,14 @@ if ($("#chatForm") && slug) {
     status.className = "status small";
     status.textContent = urlOk || modelOk ? "मैच मिला — कनेक्ट टेस्ट…" : "टेस्ट हो रहा है…";
     try {
+      // Quick test
       await jsonFetch("/api/test/" + slug, {
         method: "POST",
         body: JSON.stringify({ base_url: url, model, api_key: key }),
       });
       apiConfig = { url, model, key };
       saveLocal("api", apiConfig);
+      // Also try server save (optional)
       try {
         await jsonFetch("/api/settings/" + slug, {
           method: "POST",
@@ -622,38 +570,148 @@ if ($("#chatForm") && slug) {
     }
   };
 
+  // ===== Grok-like Voice Mode =====
   let recognizing = false;
   let recognition = null;
+  let voiceModeActive = false;
+
+  function playSoftBeep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = "sine";
+      o.frequency.value = 420;
+      g.gain.value = 0.0001;
+      g.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
+      o.start(); o.stop(ctx.currentTime + 0.2);
+    } catch (_) {}
+  }
+
+  function setVoiceUI(state) {
+    // state: idle | connecting | listening | stop
+    const btn = $("#speakBtn");
+    const status = $("#voiceStatus");
+    if (!btn) return;
+    btn.classList.remove("listening", "active");
+    if (status) {
+      status.classList.add("hidden");
+      status.classList.remove("listening", "connecting");
+    }
+    if (state === "connecting") {
+      btn.innerHTML = '<span class="speak-icon">···</span> Stop';
+      btn.classList.add("active");
+      if (status) {
+        status.textContent = "Connecting...";
+        status.classList.add("connecting");
+        status.classList.remove("hidden");
+      }
+    } else if (state === "listening") {
+      btn.innerHTML = '<span class="speak-icon">||</span> Stop';
+      btn.classList.add("listening");
+      if (status) {
+        status.textContent = "Go ahead — बोलो";
+        status.classList.add("listening");
+        status.classList.remove("hidden");
+      }
+    } else {
+      btn.innerHTML = '<span class="speak-icon">||</span> Speak';
+      if (status) status.classList.add("hidden");
+    }
+  }
+
   if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SR();
     recognition.lang = "hi-IN";
-    recognition.interimResults = false;
+    recognition.interimResults = true;
+    recognition.continuous = false;
+
+    recognition.onstart = () => {
+      recognizing = true;
+      setVoiceUI("listening");
+      playSoftBeep();
+    };
     recognition.onresult = (ev) => {
-      const t = ev.results[0][0].transcript;
-      $("#messageInput").value = ($("#messageInput").value + " " + t).trim();
+      let finalText = "";
+      for (let i = ev.resultIndex; i < ev.results.length; i++) {
+        if (ev.results[i].isFinal) finalText += ev.results[i][0].transcript;
+      }
+      if (finalText) {
+        $("#messageInput").value = finalText.trim();
+        // auto-send after short pause feel
+        setTimeout(() => {
+          if ($("#messageInput").value.trim()) sendCurrent();
+        }, 350);
+      }
+    };
+    recognition.onerror = (e) => {
+      recognizing = false;
+      voiceModeActive = false;
+      setVoiceUI("idle");
+      if (e.error !== "aborted" && e.error !== "no-speech") {
+        toast("Mic error: " + e.error);
+      }
     };
     recognition.onend = () => {
       recognizing = false;
-      $("#voiceBtn")?.classList.remove("listening");
+      if (voiceModeActive) {
+        // brief pause then ready again like Grok continuous feel
+        setTimeout(() => {
+          if (voiceModeActive && recognition) {
+            try { recognition.start(); } catch (_) { voiceModeActive = false; setVoiceUI("idle"); }
+          }
+        }, 400);
+      } else {
+        setVoiceUI("idle");
+      }
     };
   }
-  $("#voiceBtn").onclick = () => {
-    if (!recognition) {
-      const last = [...document.querySelectorAll(".message.assistant")].pop();
-      if (last) speak(last.textContent);
-      else toast("Voice input इस ब्राउज़र में उपलब्ध नहीं");
-      return;
-    }
-    if (recognizing) {
-      recognition.stop();
-      return;
-    }
-    recognizing = true;
-    $("#voiceBtn").classList.add("listening");
-    recognition.start();
-  };
 
+  function startVoiceMode() {
+    if (!recognition) {
+      toast("इस ब्राउज़र में Voice उपलब्ध नहीं (Chrome/Edge use करें)");
+      return;
+    }
+    if (!apiConfig || !apiConfig.key) {
+      toast("पहले API Key connect करो (☰ मेन्यू → API Settings)");
+      openDrawer();
+      return;
+    }
+    voiceModeActive = true;
+    setVoiceUI("connecting");
+    playSoftBeep();
+    setTimeout(() => {
+      try {
+        recognition.lang = (aiSettings?.lang === "en") ? "en-IN" : "hi-IN";
+        recognition.start();
+      } catch (e) {
+        voiceModeActive = false;
+        setVoiceUI("idle");
+        toast("Mic start नहीं हुआ");
+      }
+    }, 450);
+  }
+
+  function stopVoiceMode() {
+    voiceModeActive = false;
+    try { recognition && recognition.stop(); } catch (_) {}
+    setVoiceUI("idle");
+  }
+
+  $("#speakBtn") && ($("#speakBtn").onclick = () => {
+    if (voiceModeActive || recognizing) stopVoiceMode();
+    else startVoiceMode();
+  });
+
+  $("#micIconBtn") && ($("#micIconBtn").onclick = () => {
+    if (voiceModeActive || recognizing) stopVoiceMode();
+    else startVoiceMode();
+  });
+
+  // Send message
   async function sendCurrent() {
     const input = $("#messageInput");
     const message = input.value.trim();
@@ -674,7 +732,7 @@ if ($("#chatForm") && slug) {
     const chat = chats.find((c) => c.id === currentChatId);
     const history = (chat?.messages || [])
       .filter((m) => m.role === "user" || m.role === "assistant")
-      .slice(0, -1)
+      .slice(0, -1) // current user msg already pushed
       .slice(-16);
 
     try {
@@ -695,7 +753,7 @@ if ($("#chatForm") && slug) {
       });
       waiting.remove();
       addMessage("assistant", data.answer);
-      if (aiSettings?.autoSpeak) playTextWithVibe(data.answer);
+      if (aiSettings?.autoSpeak || voiceModeActive) speak(data.answer);
     } catch (err) {
       waiting.remove();
       addMessage("assistant", "⚠ " + err.message);
