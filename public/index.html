@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <title>GyanAI — AI Model Studio</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="landing-body">
+
+  <!-- ========== STEP 1: Google-like Email ========== -->
+  <div class="landing" id="step1">
+    <div class="google-card">
+      <div class="google-logo">
+        <span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span>
+      </div>
+      <h1 class="google-title">Sign in</h1>
+      <p class="google-sub">Use your Google Account</p>
+
+      <form id="emailForm" autocomplete="off">
+        <div class="google-input-wrap">
+          <input type="email" id="emailInput" name="email" required
+                 placeholder="Email or phone" maxlength="160" autofocus>
+        </div>
+        <div class="google-links">
+          <a href="#" class="forgot-link" onclick="return false;">Forgot email?</a>
+        </div>
+        <p class="google-guest">Not your computer? Use Guest mode to sign in privately.</p>
+        <div class="google-actions">
+          <a href="#" class="create-account" onclick="return false;">Create account</a>
+          <button type="submit" class="btn-google-next" id="emailNextBtn">Next</button>
+        </div>
+      </form>
+      <div id="emailStatus" class="status"></div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 2: Details Form ========== -->
+  <div class="landing hidden" id="step2">
+    <div class="landing-card details-card">
+      <div class="logo-big">
+        <span class="spark">✦</span>
+        <span>Gyan<span class="blue">AI</span></span>
+      </div>
+      <h1>अपना AI बनाएं</h1>
+      <p class="sub">नीचे दी गई जानकारी भरें।</p>
+
+      <form id="detailsForm" autocomplete="off">
+        <label class="field-label">Gmail ID</label>
+        <input type="email" id="detailEmail" name="email" required
+               placeholder="you@gmail.com" maxlength="160">
+
+        <label class="field-label">मोबाइल नंबर</label>
+        <input type="tel" id="detailPhone" name="phone" required
+               placeholder="+91 98765 43210" maxlength="20">
+
+        <label class="field-label">Username</label>
+        <input type="text" id="detailUsername" name="username" required
+               placeholder="अपना नाम / username" maxlength="80">
+
+        <label class="field-label">Address</label>
+        <input type="text" id="detailAddress" name="address" required
+               placeholder="शहर / पूरा पता" maxlength="200">
+
+        <button type="submit" class="btn-primary" id="detailsBtn">
+          Continue →
+        </button>
+      </form>
+      <div id="detailsStatus" class="status"></div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 3: AI Model Studio (Professional) ========== -->
+  <div class="studio hidden" id="step3">
+    <!-- Top Bar -->
+    <header class="studio-top">
+      <div class="studio-brand">
+        <span class="spark">✦</span>
+        <span>Gyan<span class="blue">AI</span></span>
+        <span class="studio-badge">Studio</span>
+      </div>
+      <div class="studio-actions">
+        <button type="button" class="icon-btn" id="studioMoreBtn" aria-label="More">⋮</button>
+        <div id="studioMoreMenu" class="more-menu hidden">
+          <button type="button" data-action="docs">Documentation</button>
+          <button type="button" data-action="models">Model Library</button>
+          <button type="button" data-action="pricing">Pricing</button>
+          <button type="button" data-action="support">Support</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Search Area -->
+    <div class="studio-search-wrap">
+      <form id="searchForm" class="studio-search-form" autocomplete="off">
+        <div class="studio-search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput"
+                 placeholder="Describe your AI or search templates..."
+                 maxlength="120" autofocus>
+          <button type="submit" class="studio-create-btn" id="searchBtn">
+            Create AI
+          </button>
+        </div>
+      </form>
+      <p class="studio-hint">Type anything or pick a template below. Your AI will be ready in seconds.</p>
+      <div id="searchStatus" class="status"></div>
+    </div>
+
+    <!-- Categories -->
+    <div class="studio-cats" id="studioCats">
+      <button type="button" class="cat-chip active" data-cat="all">All</button>
+      <button type="button" class="cat-chip" data-cat="business">Business</button>
+      <button type="button" class="cat-chip" data-cat="education">Education</button>
+      <button type="button" class="cat-chip" data-cat="coding">Coding</button>
+      <button type="button" class="cat-chip" data-cat="personal">Personal</button>
+      <button type="button" class="cat-chip" data-cat="health">Health</button>
+      <button type="button" class="cat-chip" data-cat="creative">Creative</button>
+      <button type="button" class="cat-chip" data-cat="support">Support</button>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="studio-grid" id="templateGrid">
+      <!-- Filled by JS -->
+    </div>
+
+    <!-- Generation Overlay -->
+    <div id="thinkingBox" class="gen-overlay hidden">
+      <div class="gen-card">
+        <div class="gen-logo">✦ GyanAI</div>
+        <h2 id="genTitle">Building your AI model…</h2>
+        <p class="gen-sub" id="genSub">This usually takes a few seconds</p>
+
+        <div class="gen-progress">
+          <div class="gen-bar"><div class="gen-fill" id="genFill"></div></div>
+          <div class="gen-steps" id="genSteps">
+            <div class="gen-step" data-step="1">✓ Initializing workspace</div>
+            <div class="gen-step" data-step="2">○ Loading knowledge base</div>
+            <div class="gen-step" data-step="3">○ Configuring personality</div>
+            <div class="gen-step" data-step="4">○ Optimizing responses</div>
+            <div class="gen-step" data-step="5">○ Finalizing model</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 4: Success ========== -->
+  <div class="landing hidden" id="step4">
+    <div class="landing-card success-card">
+      <div class="success-icon">✓</div>
+      <h1>आपका AI तैयार है!</h1>
+      <p class="sub" id="successPurpose">Your custom AI model is ready to use.</p>
+
+      <div class="link-box">
+        <a id="aiLink" href="#" target="_blank" rel="noopener" class="ai-link"></a>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" class="btn-secondary" id="copyBtn">Copy Link</button>
+        <a id="openBtn" href="#" class="btn-primary" target="_blank" rel="noopener">Open AI →</a>
+      </div>
+      <p class="tiny">Keep this link safe. Anyone with the link can chat with your AI.</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/public/app.js"></script>
+</body>
+</html>
