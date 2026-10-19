@@ -11,7 +11,7 @@ button{cursor:pointer;border:none;background:none}
 
 /* Themes */
 body.theme-dark{--bg:#121212;--card:#1e1e1e;--ink:#f1f1f1;--muted:#aaa;--line:#333;--msg-user:#2962ff}
-body.theme-dark .chat-top,body.theme-dark .composer,body.theme-dark .drawer,body.theme-dark .message.assistant,body.theme-dark .modal-sheet,body.theme-dark .settings-box{background:#1e1e1e;color:var(-[...]
+body.theme-dark .chat-top,body.theme-dark .composer,body.theme-dark .drawer,body.theme-dark .message.assistant,body.theme-dark .modal-sheet,body.theme-dark .settings-box{background:#1e1e1e;color:var(--ink)}
 body.theme-dark .composer-wrap{background:#121212}
 body.theme-blue{--blue:#0d47a1;--bg:#e3f2fd}
 body.theme-purple{--blue:#6a1b9a;--bg:#f3e5f5}
@@ -53,7 +53,7 @@ body.theme-green{--blue:#2e7d32;--bg:#e8f5e9}
 body.theme-dark .icon-btn{color:#ddd}
 .icon-btn:hover{background:rgba(0,0,0,.06)}
 
-.drawer{position:fixed;z-index:30;top:0;left:0;bottom:0;width:min(320px,88vw);background:var(--card);box-shadow:10px 0 40px rgba(0,0,0,.15);transform:translateX(-110%);transition:transform .22s;paddin[...]
+.drawer{position:fixed;z-index:30;top:0;left:0;bottom:0;width:min(320px,88vw);background:var(--card);box-shadow:10px 0 40px rgba(0,0,0,.15);transform:translateX(-110%);transition:transform .22s;padding:14px 12px 16px;overflow-y:auto}
 .drawer.open{transform:translateX(0)}
 .drawer-head{display:flex;justify-content:space-between;align-items:center;padding:4px 4px 12px;border-bottom:1px solid var(--line);font-size:1.05rem}
 .drawer-label{color:var(--muted);font-size:.72rem;font-weight:700;margin:16px 4px 8px;text-transform:uppercase;letter-spacing:.4px}
@@ -126,11 +126,10 @@ body.compact .message{padding:8px 12px}
   100% { transform: scale(1); box-shadow: 0 6px 18px rgba(11,114,255,0.18); }
 }
 
-/* small mic-like visual if needed */
 .message.assistant .msg-speak .mic-ico { font-size: 16px; }
 
 .composer-wrap{flex:0 0 auto;width:100%;padding:8px 10px;padding-bottom:max(10px,env(safe-area-inset-bottom,10px));background:var(--bg);border-top:1px solid var(--line);z-index:20}
-.composer{width:100%;max-width:720px;margin:0 auto;padding:6px 8px 6px 10px;display:flex;align-items:flex-end;gap:8px;border:1px solid var(--line);border-radius:28px;background:var(--card);box-shadow:[...]
+.composer{width:100%;max-width:720px;margin:0 auto;padding:6px 8px 6px 10px;display:flex;align-items:flex-end;gap:8px;border:1px solid var(--line);border-radius:28px;background:var(--card);box-shadow:0 4px 12px rgba(0,0,0,.04)}
 .composer textarea{border:0;background:transparent;margin:0;padding:10px 0;max-height:120px;min-height:40px;flex:1;resize:none;outline:none;color:var(--ink);font-size:.95rem}
 .voice-btn{width:38px;height:38px;border-radius:50%;font-size:18px;flex-shrink:0;background:#f0f4f8}
 body.theme-dark .voice-btn{background:#333}
@@ -139,7 +138,7 @@ body.theme-dark .voice-btn{background:#333}
 .send-btn{flex-shrink:0;width:40px;height:40px;border-radius:50%;background:var(--blue);color:#fff;font-size:17px;display:grid;place-items:center}
 .send-btn:disabled{opacity:.45}
 
-.toast{position:fixed;bottom:100px;left:50%;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:#17212f;color:#fff;padding:11px 16px;border-radius:12px;font-size:.85rem;max-width:9[...]
+.toast{position:fixed;bottom:100px;left:50%;transform:translate(-50%,12px);opacity:0;pointer-events:none;background:#17212f;color:#fff;padding:11px 16px;border-radius:12px;font-size:.85rem;max-width:90vw}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
 .modal-overlay{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
