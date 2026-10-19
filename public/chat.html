@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0b1220">
+  <title>GyanAI</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="chat-body" data-theme="dark">
+
+  <!-- Drawer -->
+  <aside id="drawer" class="drawer">
+    <div class="drawer-head">
+      <strong>☰ मेन्यू</strong>
+      <button type="button" id="closeDrawer" class="icon-btn">✕</button>
+    </div>
+    <button type="button" id="newChatBtn" class="menu-item">＋ नई चैट</button>
+    <div class="drawer-label">हाल की चैट</div>
+    <div id="historyList"></div>
+  </aside>
+  <div id="shade" class="shade hidden"></div>
+
+  <!-- Top -->
+  <header class="chat-top">
+    <button type="button" id="openDrawer" class="icon-btn" aria-label="मेन्यू">☰</button>
+    <div class="brand"><span class="spark">✦</span><span>Gyan<span class="blue">AI</span></span></div>
+    <button type="button" id="moreBtn" class="icon-btn" aria-label="विकल्प">⋮</button>
+    <div id="moreMenu" class="more-menu hidden">
+      <button type="button" id="settingsBtn">⚙ Settings</button>
+      <button type="button" id="shareBtn">AI लिंक कॉपी करें</button>
+      <button type="button" id="historyMenuBtn">चैट हिस्ट्री</button>
+    </div>
+  </header>
+
+  <!-- Messages -->
+  <main class="chat-main" id="chatMain">
+    <section id="welcomeCard" class="chat-welcome">
+      <h1>नमस्कार! 👋</h1>
+      <p>आज मैं आपकी कैसे मदद कर सकता हूँ?</p>
+    </section>
+    <section id="messages" class="messages"></section>
+  </main>
+
+  <!-- Composer -->
+  <div class="composer-wrap" id="composerWrap">
+    <form id="chatForm" class="composer" autocomplete="off">
+      <button type="button" id="voiceBtn" class="voice-sphere" title="Voice" aria-label="Voice">
+        <span class="sphere-core"></span>
+      </button>
+      <textarea id="messageInput" rows="1" placeholder="यहाँ मैसेज लिखें..." maxlength="6000"></textarea>
+      <button type="submit" class="send-btn" id="sendBtn" aria-label="भेजें">➤</button>
+    </form>
+  </div>
+
+  <!-- Settings Panel -->
+  <div id="settingsPanel" class="settings-panel hidden">
+    <div class="settings-head">
+      <strong>⚙ Settings</strong>
+      <button type="button" id="closeSettings" class="icon-btn">✕</button>
+    </div>
+    <div class="settings-body">
+
+      <div class="set-section">
+        <div class="set-title">🔌 API Connection</div>
+        <label>Grok (xAI) API Key</label>
+        <input type="password" id="setKey" placeholder="xai-..." autocomplete="off">
+        <label>ElevenLabs API Key (Voice)</label>
+        <input type="password" id="setElevenKey" placeholder="sk_..." autocomplete="off">
+        <div class="set-btns">
+          <button type="button" id="testBtn" class="btn-secondary small">Test</button>
+          <button type="button" id="saveSettingsBtn" class="btn-primary small">Save / Connect</button>
+        </div>
+        <div id="settingsStatus" class="status small"></div>
+        <p class="hint-tiny">Base URL & models are pre-configured for Grok. Only paste your API keys.</p>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">🎤 Voice</div>
+        <label>Voice Engine</label>
+        <select id="setVoiceEngine">
+          <option value="eleven">ElevenLabs (Natural)</option>
+          <option value="browser">Browser TTS</option>
+          <option value="off">Off</option>
+        </select>
+        <label>ElevenLabs Voice</label>
+        <select id="setElevenVoice">
+          <option value="21m00Tcm4TlvDq8ikWAM">Rachel (Calm)</option>
+          <option value="AZnzlk1XvdvUeBnXmlld">Domi (Strong)</option>
+          <option value="EXAVITQu4vr4xnSDxMaL">Bella (Soft)</option>
+          <option value="ErXwobaYiN019PkySvjV">Antoni (Warm)</option>
+          <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Young)</option>
+          <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Deep)</option>
+          <option value="VR6AewLTigWG4xSOukaG">Arnold (Firm)</option>
+          <option value="pNInz6obpgDQGcFmaJgB">Adam (Narrative)</option>
+          <option value="yoZ06aMxZJJ28mfd3POQ">Sam (Casual)</option>
+        </select>
+        <label>Speak Replies</label>
+        <select id="setAutoSpeak">
+          <option value="on">On</option>
+          <option value="off">Off</option>
+        </select>
+        <label>Voice Speed</label>
+        <select id="setVoiceSpeed">
+          <option value="0.85">Slow</option>
+          <option value="1" selected>Normal</option>
+          <option value="1.15">Fast</option>
+          <option value="1.3">Very Fast</option>
+        </select>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">🌐 Language</div>
+        <label>Reply Language</label>
+        <select id="setLang">
+          <option value="auto">Auto (match user)</option>
+          <option value="hi">Hindi</option>
+          <option value="en">English</option>
+          <option value="hinglish">Hinglish</option>
+        </select>
+        <label>Input Language Hint</label>
+        <select id="setInputLang">
+          <option value="hi-IN">Hindi</option>
+          <option value="en-IN">English (India)</option>
+          <option value="en-US">English (US)</option>
+        </select>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">🎨 Theme & Look</div>
+        <label>Theme</label>
+        <select id="setTheme">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+          <option value="midnight">Midnight Blue</option>
+          <option value="emerald">Emerald</option>
+          <option value="sunset">Sunset</option>
+          <option value="royal">Royal Purple</option>
+        </select>
+        <label>Font Size</label>
+        <select id="setFontSize">
+          <option value="14">Small</option>
+          <option value="16" selected>Medium</option>
+          <option value="18">Large</option>
+          <option value="20">Extra Large</option>
+        </select>
+        <label>Bubble Style</label>
+        <select id="setBubble">
+          <option value="rounded">Rounded</option>
+          <option value="soft">Soft</option>
+          <option value="sharp">Sharp</option>
+          <option value="pill">Pill</option>
+        </select>
+        <label>Message Density</label>
+        <select id="setDensity">
+          <option value="comfy">Comfortable</option>
+          <option value="compact">Compact</option>
+        </select>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">💬 Chat Behaviour</div>
+        <label>Response Style</label>
+        <select id="setStyle">
+          <option value="balanced">Balanced</option>
+          <option value="short">Short & Crisp</option>
+          <option value="detailed">Detailed</option>
+          <option value="friendly">Friendly</option>
+          <option value="professional">Professional</option>
+          <option value="witty">Witty</option>
+        </select>
+        <label>Emoji Level</label>
+        <select id="setEmoji">
+          <option value="normal">Normal</option>
+          <option value="high">More Emojis</option>
+          <option value="low">Minimal</option>
+          <option value="none">None</option>
+        </select>
+        <label>Show Timestamps</label>
+        <select id="setTimestamps">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+        <label>Enter to Send</label>
+        <select id="setEnterSend">
+          <option value="on">On</option>
+          <option value="off">Off (Shift+Enter)</option>
+        </select>
+        <label>Sound on Reply</label>
+        <select id="setSound">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+        <label>Keep Screen Awake</label>
+        <select id="setWake">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">🔒 Privacy</div>
+        <label>Save Chat History</label>
+        <select id="setSaveHistory">
+          <option value="on">On</option>
+          <option value="off">Off</option>
+        </select>
+        <label>Show Typing Indicator</label>
+        <select id="setTyping">
+          <option value="on">On</option>
+          <option value="off">Off</option>
+        </select>
+        <label>Clear on Exit</label>
+        <select id="setClearExit">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">⚡ Advanced</div>
+        <label>Temperature Feel</label>
+        <select id="setTemp">
+          <option value="0.4">Focused</option>
+          <option value="0.7" selected>Balanced</option>
+          <option value="0.9">Creative</option>
+          <option value="1.1">Wild</option>
+        </select>
+        <label>Max Reply Length</label>
+        <select id="setMaxLen">
+          <option value="512">Short</option>
+          <option value="1024">Medium</option>
+          <option value="2048" selected>Long</option>
+          <option value="4096">Very Long</option>
+        </select>
+        <label>Stream Feel</label>
+        <select id="setStreamFeel">
+          <option value="smooth">Smooth</option>
+          <option value="instant">Instant</option>
+        </select>
+        <label>Signature Line</label>
+        <select id="setSignature">
+          <option value="on">On (unique mark)</option>
+          <option value="off">Off</option>
+        </select>
+        <label>Debug Mode</label>
+        <select id="setDebug">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+
+      <p class="hint-tiny" style="margin:16px 0 8px">Settings save on this device. API keys are encrypted on server when connected.</p>
+    </div>
+  </div>
+
+  <!-- Confirm -->
+  <div id="confirmModal" class="confirm-overlay hidden">
+    <div class="confirm-box">
+      <p id="confirmText">यह चैट डिलीट करें?</p>
+      <div class="confirm-btns">
+        <button type="button" id="confirmCancel" class="btn-secondary small">रद्द करें</button>
+        <button type="button" id="confirmOk" class="btn-danger small">डिलीट करें</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jarvis-style loading overlay (exact style from reference video) -->
+  <div id="jarvisOverlay" class="jarvis-overlay hidden">
+    <div class="jarvis-stage">
+      <div id="jarvisCircle" class="jarvis-circle">
+        <span id="jarvisCount">0</span>
+      </div>
+      <div id="jarvisOrb" class="jarvis-orb hidden"></div>
+      <div id="jarvisLabel" class="jarvis-label hidden">GyanAI</div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/public/app.js"></script>
+</body>
+</html>
