@@ -320,19 +320,25 @@ def update_settings(slug):
 
 @app.post("/api/test/<slug>")
 def test_connection(slug):
+    """Fast connect. Works even if AI row missing (Render free DB wipe) when full credentials are sent."""
     data = request.get_json(silent=True) or {}
+    ai = None
     with db() as con:
         ai = con.execute("SELECT * FROM ais WHERE slug=?", (slug,)).fetchone()
-    if not ai:
-        return jsonify(error="AI नहीं मिला।"), 404
+
     try:
-        base_url = safe_base_url(data.get("base_url") or ai["base_url"])
+        base_url = safe_base_url(data.get("base_url") or (ai["base_url"] if ai else ""))
     except ValueError as e:
         return jsonify(error=str(e)), 400
-    model = (data.get("model") or ai["model"] or "").strip()
-    api_key = (data.get("api_key") or "").strip() or decrypt_key(ai["encrypted_api_key"])
+
+    model = (data.get("model") or (ai["model"] if ai else "") or "").strip()
+    api_key = (data.get("api_key") or "").strip()
+    if not api_key and ai:
+        api_key = decrypt_key(ai["encrypted_api_key"])
+
     if not base_url or not model or not api_key:
         return jsonify(error="URL, Model और API Key सभी चाहिए।"), 400
+
     endpoint = chat_endpoint(base_url)
     try:
         resp = requests.post(
@@ -343,11 +349,21 @@ def test_connection(slug):
                 "messages": [{"role": "user", "content": "Reply only with: OK"}],
                 "max_tokens": 8,
             },
-            timeout=15,
+            timeout=12,
         )
         if resp.ok:
-            return jsonify(message="कनेक्शन सफल! ✅")
-        return jsonify(error=f"Provider {resp.status_code}: {resp.text[:300]}"), 400
+            if ai:
+                try:
+                    encrypted = encrypt_key(api_key)
+                    with db() as con:
+                        con.execute(
+                            "UPDATE ais SET base_url=?, model=?, encrypted_api_key=? WHERE slug=?",
+                            (base_url, model, encrypted, slug),
+                        )
+                except Exception:
+                    pass
+            return jsonify(message="कनेक्शन सफल! ✅ Fast & Ready")
+        return jsonify(error=f"Provider {resp.status_code}: {resp.text[:280]}"), 400
     except requests.RequestException as exc:
         return jsonify(error="कनेक्शन नहीं हुआ: " + str(exc)[:200]), 400
 
