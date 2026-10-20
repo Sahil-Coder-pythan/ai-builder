@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0b1220">
+  <title>GyanAI</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="chat-body" data-theme="dark">
+
+  <!-- Drawer -->
+  <aside id="drawer" class="drawer">
+    <div class="drawer-head">
+      <strong>☰ मेन्यू</strong>
+      <button type="button" id="closeDrawer" class="icon-btn">✕</button>
+    </div>
+    <button type="button" id="newChatBtn" class="menu-item">＋ नई चैट</button>
+    <div class="drawer-label">हाल की चैट</div>
+    <div id="historyList"></div>
+  </aside>
+  <div id="shade" class="shade hidden"></div>
+
+  <!-- Top -->
+  <header class="chat-top">
+    <button type="button" id="openDrawer" class="icon-btn" aria-label="मेन्यू">☰</button>
+    <div class="brand"><span class="spark">✦</span><span>Gyan<span class="blue">AI</span></span></div>
+    <button type="button" id="moreBtn" class="icon-btn" aria-label="विकल्प">⋮</button>
+    <div id="moreMenu" class="more-menu hidden">
+      <button type="button" id="settingsBtn">⚙ Settings</button>
+      <button type="button" id="shareBtn">AI लिंक कॉपी करें</button>
+      <button type="button" id="historyMenuBtn">चैट हिस्ट्री</button>
+    </div>
+  </header>
+
+  <!-- Messages -->
+  <main class="chat-main" id="chatMain">
+    <section id="welcomeCard" class="chat-welcome">
+      <h1>नमस्कार! 👋</h1>
+      <p>आज मैं आपकी कैसे मदद कर सकता हूँ?</p>
+    </section>
+    <section id="messages" class="messages"></section>
+  </main>
+
+  <!-- Composer -->
+  <div class="composer-wrap" id="composerWrap">
+    <div id="attachPreview" class="attach-preview hidden"></div>
+    <form id="chatForm" class="composer" autocomplete="off">
+      <button type="button" id="attachBtn" class="attach-btn" title="Photo / File" aria-label="Attach">＋</button>
+      <input type="file" id="attachInput" accept="image/*,.pdf,.txt,.doc,.docx" hidden>
+      <button type="button" id="voiceBtn" class="voice-sphere" title="Voice" aria-label="Voice">
+        <span class="sphere-core"></span>
+      </button>
+      <textarea id="messageInput" rows="1" placeholder="यहाँ मैसेज लिखें..." maxlength="6000"></textarea>
+      <button type="submit" class="send-btn" id="sendBtn" aria-label="भेजें">➤</button>
+    </form>
+  </div>
+
+  <!-- Settings Panel -->
+  <div id="settingsPanel" class="settings-panel hidden">
+    <div class="settings-head">
+      <strong>⚙ Settings</strong>
+      <button type="button" id="closeSettings" class="icon-btn">✕</button>
+    </div>
+    <div class="settings-body">
+
+      <div class="set-section protected-api">
+        <div class="set-title">🔌 API Connection <span class="lock-badge">🔒 Protected</span></div>
+        <label>Base URL</label>
+        <input type="text" id="setBaseUrl" placeholder="https://api.groq.com/openai/v1" autocomplete="off">
+        <label>Model</label>
+        <input type="text" id="setModel" placeholder="llama-3.3-70b-versatile" autocomplete="off">
+        <label>API Key</label>
+        <input type="password" id="setKey" placeholder="gsk_... या xai-..." autocomplete="off">
+        <label>ElevenLabs API Key (Voice)</label>
+        <input type="password" id="setElevenKey" placeholder="sk_..." autocomplete="off">
+        <div class="set-btns">
+          <button type="button" id="testBtn" class="btn-secondary small">Test</button>
+          <button type="button" id="saveSettingsBtn" class="btn-primary small">Save / Connect</button>
+        </div>
+        <div id="settingsStatus" class="status small"></div>
+        <p class="hint-tiny">Groq / xAI / कोई भी OpenAI-compatible URL + Model + Key डालो। Save पर fast connect हो जाएगा।</p>
+      </div>
+
+      <div class="set-section protected-voice">
+        <div class="set-title">🎙 Voice (ElevenLabs) <span class="lock-badge">🔒 Protected</span></div>
+        <label>Voice Engine</label>
+        <select id="setVoiceEngine">
+          <option value="eleven">ElevenLabs (Natural)</option>
+          <option value="browser">Browser TTS</option>
+          <option value="off">Off</option>
+        </select>
+        <label>ElevenLabs Voice</label>
+        <select id="setElevenVoice">
+          <option value="pNInz6obpgDQGcFmaJgB">Adam (Clear – recommended)</option>
+          <option value="21m00Tcm4TlvDq8ikWAM">Rachel (Calm)</option>
+          <option value="EXAVITQu4vr4xnSDxMaL">Bella (Soft)</option>
+          <option value="ErXwobaYiN019PkySvjV">Antoni (Warm)</option>
+          <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Deep)</option>
+          <option value="AZnzlk1XvdvUeBnXmlld">Domi (Strong)</option>
+          <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Young)</option>
+          <option value="VR6AewLTigWG4xSOukaG">Arnold (Firm)</option>
+          <option value="yoZ06aMxZJJ28mfd3POQ">Sam (Casual)</option>
+        </select>
+        <label>Speak Replies</label>
+        <select id="setAutoSpeak">
+          <option value="off" selected>Off</option>
+          <option value="on">On (ElevenLabs only)</option>
+        </select>
+        <label>Voice Speed</label>
+        <select id="setVoiceSpeed">
+          <option value="0.85">Slow</option>
+          <option value="1" selected>Normal</option>
+          <option value="1.15">Fast</option>
+          <option value="1.3">Very Fast</option>
+        </select>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">🌐 Language</div>
+        <label>Reply Language</label>
+        <select id="setLang">
+          <option value="auto">Auto (match user)</option>
+          <option value="hi">Hindi</option>
+          <option value="en">English</option>
+          <option value="hinglish">Hinglish</option>
+        </select>
+        <label>Input Language Hint</label>
+        <select id="setInputLang">
+          <option value="hi-IN">Hindi</option>
+          <option value="en-IN">English (India)</option>
+          <option value="en-US">English (US)</option>
+        </select>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">🎨 Theme & Look</div>
+        <label>Theme</label>
+        <select id="setTheme">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+          <option value="midnight">Midnight Blue</option>
+          <option value="emerald">Emerald</option>
+          <option value="sunset">Sunset</option>
+          <option value="royal">Royal Purple</option>
+        </select>
+        <label>Font Size</label>
+        <select id="setFontSize">
+          <option value="14">Small</option>
+          <option value="16" selected>Medium</option>
+          <option value="18">Large</option>
+          <option value="20">Extra Large</option>
+        </select>
+        <label>Bubble Style</label>
+        <select id="setBubble">
+          <option value="rounded">Rounded</option>
+          <option value="soft">Soft</option>
+          <option value="sharp">Sharp</option>
+          <option value="pill">Pill</option>
+        </select>
+        <label>Message Density</label>
+        <select id="setDensity">
+          <option value="comfy">Comfortable</option>
+          <option value="compact">Compact</option>
+        </select>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">💬 Chat Behaviour</div>
+        <label>Response Style</label>
+        <select id="setStyle">
+          <option value="balanced">Balanced</option>
+          <option value="short">Short & Crisp</option>
+          <option value="detailed">Detailed</option>
+          <option value="friendly">Friendly</option>
+          <option value="professional">Professional</option>
+          <option value="witty">Witty</option>
+        </select>
+        <label>Emoji Level</label>
+        <select id="setEmoji">
+          <option value="normal">Normal</option>
+          <option value="high">More Emojis</option>
+          <option value="low">Minimal</option>
+          <option value="none">None</option>
+        </select>
+        <label>Show Timestamps</label>
+        <select id="setTimestamps">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+        <label>Enter to Send</label>
+        <select id="setEnterSend">
+          <option value="on">On</option>
+          <option value="off">Off (Shift+Enter)</option>
+        </select>
+        <label>Sound on Reply</label>
+        <select id="setSound">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+        <label>Keep Screen Awake</label>
+        <select id="setWake">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">🔒 Privacy</div>
+        <label>Save Chat History</label>
+        <select id="setSaveHistory">
+          <option value="on">On</option>
+          <option value="off">Off</option>
+        </select>
+        <label>Show Typing Indicator</label>
+        <select id="setTyping">
+          <option value="on">On</option>
+          <option value="off">Off</option>
+        </select>
+        <label>Clear on Exit</label>
+        <select id="setClearExit">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+
+      <div class="set-section">
+        <div class="set-title">⚡ Advanced</div>
+        <label>Temperature Feel</label>
+        <select id="setTemp">
+          <option value="0.4">Focused</option>
+          <option value="0.7" selected>Balanced</option>
+          <option value="0.9">Creative</option>
+          <option value="1.1">Wild</option>
+        </select>
+        <label>Max Reply Length</label>
+        <select id="setMaxLen">
+          <option value="512">Short</option>
+          <option value="1024">Medium</option>
+          <option value="2048" selected>Long</option>
+          <option value="4096">Very Long</option>
+        </select>
+        <label>Stream Feel</label>
+        <select id="setStreamFeel">
+          <option value="smooth">Smooth</option>
+          <option value="instant">Instant</option>
+        </select>
+        <label>Signature Line</label>
+        <select id="setSignature">
+          <option value="on">On (unique mark)</option>
+          <option value="off">Off</option>
+        </select>
+        <label>Debug Mode</label>
+        <select id="setDebug">
+          <option value="off">Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+
+      
+      <div class="set-section" id="devEditSection">
+        <div class="set-title">🛠 Developer Edit Mode</div>
+        <p class="hint-tiny">सिर्फ <strong>इस AI</strong> पर लागू होता है। Core tool / GitHub code नहीं बदलता।</p>
+
+        <label>Accent Color</label>
+        <input type="color" id="devAccent" value="#3b82f6">
+        <label>Background Color</label>
+        <input type="color" id="devBg" value="#0b1220">
+        <label>User Bubble Color</label>
+        <input type="color" id="devUserBubble" value="#2563eb">
+        <label>AI Bubble Color</label>
+        <input type="color" id="devAiBubble" value="#1e293b">
+        <label>Header Color</label>
+        <input type="color" id="devHeader" value="#0f172a">
+        <label>Composer Color</label>
+        <input type="color" id="devComposer" value="#0f172a">
+        <label>Sphere Color</label>
+        <input type="color" id="devSphere" value="#3b82f6">
+        <label>Sphere Size</label>
+        <select id="devSphereSize">
+          <option value="48">Small</option>
+          <option value="64" selected>Medium</option>
+          <option value="88">Large</option>
+          <option value="120">Huge</option>
+        </select>
+        <label>Glow Intensity</label>
+        <select id="devGlow">
+          <option value="0.3">Soft</option>
+          <option value="0.55" selected>Normal</option>
+          <option value="0.85">Strong</option>
+          <option value="1">Max</option>
+        </select>
+        <label>Menu (⋮) Position</label>
+        <select id="devMenuPos">
+          <option value="top-right" selected>Top Right</option>
+          <option value="top-left">Top Left</option>
+          <option value="bottom-right">Bottom Right</option>
+          <option value="bottom-left">Bottom Left</option>
+        </select>
+        <label>Sidebar Side</label>
+        <select id="devSidebar">
+          <option value="left" selected>Left</option>
+          <option value="right">Right</option>
+        </select>
+        <label>Border Radius</label>
+        <select id="devRadius">
+          <option value="8">Sharp</option>
+          <option value="14" selected>Soft</option>
+          <option value="22">Round</option>
+          <option value="999">Pill</option>
+        </select>
+        <label>Message Spacing</label>
+        <select id="devSpacing">
+          <option value="6">Tight</option>
+          <option value="10" selected>Normal</option>
+          <option value="16">Airy</option>
+        </select>
+        <label>Font Family</label>
+        <select id="devFont">
+          <option value="system-ui">System</option>
+          <option value="Georgia, serif">Serif</option>
+          <option value="'Segoe UI', sans-serif" selected>Segoe</option>
+          <option value="monospace">Mono</option>
+        </select>
+        <label>Animation Speed</label>
+        <select id="devAnim">
+          <option value="0.7">Fast</option>
+          <option value="1" selected>Normal</option>
+          <option value="1.4">Slow</option>
+        </select>
+        <label>Welcome Title</label>
+        <input type="text" id="devWelcomeTitle" placeholder="नमस्कार! 👋" maxlength="80">
+        <label>Welcome Subtitle</label>
+        <input type="text" id="devWelcomeSub" placeholder="आज मैं आपकी कैसे मदद कर सकता हूँ?" maxlength="160">
+        <label>Custom AI Title</label>
+        <input type="text" id="devCustomTitle" placeholder="GyanAI" maxlength="40">
+        <label>Response Style Override</label>
+        <select id="devRespStyle">
+          <option value="">(use main setting)</option>
+          <option value="balanced">Balanced</option>
+          <option value="short">Short</option>
+          <option value="detailed">Detailed</option>
+          <option value="professional">Professional</option>
+          <option value="friendly">Friendly</option>
+          <option value="witty">Witty</option>
+        </select>
+        <p class="hint-tiny">⚠ Photo <strong>generate</strong> system locked (admin only). File/video <strong>receive</strong> design code से add कर सकते हो। Grok + ElevenLabs boxes कभी नहीं हट सकते; extra API box (Gemini आदि) add करने पर error आएगा।</p>
+
+        <label style="margin-top:14px">💻 Custom Code</label>
+        <p class="hint-tiny">
+          CSS लिखो या JSON config। Mix: पहले CSS, फिर <code>/*CONFIG*/</code> फिर JSON।<br>
+          सिर्फ <strong>इस AI</strong> में लगेगा। Grok API + ElevenLabs boxes <strong>हटा नहीं सकते</strong>।
+        </p>
+        <textarea id="devCode" rows="10" placeholder="/* example CSS */
+.chat-body { --accent: #22d3ee; }
+
+/*CONFIG*/
+{
+  &quot;sphereColor&quot;: &quot;#22d3ee&quot;,
+  &quot;menuPosition&quot;: &quot;top-left&quot;,
+  &quot;welcomeTitle&quot;: &quot;Hello Boss&quot;
+}"></textarea>
+        <div class="btn-row" style="margin-top:10px;gap:8px;display:flex;flex-wrap:wrap">
+          <button type="button" id="connectCodeBtn" class="btn-primary small">Connect Code</button>
+          <button type="button" id="applyDevColorsBtn" class="btn-secondary small">Apply Colors</button>
+          <button type="button" id="resetDevBtn" class="btn-secondary small">Reset Custom</button>
+        </div>
+        <pre id="devCodeError" class="code-error hidden"></pre>
+        <p class="hint-tiny" id="devCodeStatus"></p>
+      </div>
+
+      <div class="set-section" id="deleteAiSection" style="border:1px solid #ef444455;margin-top:18px">
+        <div class="set-title">⚠️ Delete this AI</div>
+        <p class="hint-tiny">यह विकल्प Settings के सबसे नीचे है। डिलीट करने पर इस AI की चैट, कस्टम डिज़ाइन और सेटिंग हट जाएँगी। इसी मोबाइल नंबर से नया AI बनाने के लिए पूरे <strong>24 घंटे</strong> इंतज़ार करना होगा। ईमेल लिंक-इतिहास सुरक्षित रहेगा।</p>
+        <button type="button" id="deleteAiBtn" class="btn-danger small" style="width:100%;margin-top:10px">Delete My AI</button>
+        <p class="hint-tiny" id="deleteAiStatus" aria-live="polite"></p>
+      </div>
+
+<p class="hint-tiny" style="margin:16px 0 8px">Settings save on this device. API keys are encrypted on server when connected.</p>
+    </div>
+  </div>
+
+  <!-- Confirm -->
+  <div id="confirmModal" class="confirm-overlay hidden">
+    <div class="confirm-box">
+      <p id="confirmText">यह चैट डिलीट करें?</p>
+      <div class="confirm-btns">
+        <button type="button" id="confirmCancel" class="btn-secondary small">रद्द करें</button>
+        <button type="button" id="confirmOk" class="btn-danger small">डिलीट करें</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jarvis-style loading overlay (exact style from reference video) -->
+  <div id="jarvisOverlay" class="jarvis-overlay hidden">
+    <div class="jarvis-stage">
+      <div id="jarvisCircle" class="jarvis-circle">
+        <span id="jarvisCount">0</span>
+      </div>
+      <div id="jarvisOrb" class="jarvis-orb hidden"></div>
+      <div id="jarvisLabel" class="jarvis-label hidden">GyanAI</div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/public/app.js"></script>
+</body>
+</html>
