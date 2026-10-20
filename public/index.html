@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#ffffff">
+  <title>Gyan AI — Stratic Soft</title>
+  <link rel="stylesheet" href="/public/style.css">
+</head>
+<body class="landing-body auth-body">
+
+  <!-- ========== GYAN AI SPLASH (NO LOGIN) ========== -->
+  <div class="auth-wrap splash-wrap" id="step1">
+    <div class="splash-content">
+      <div class="splash-logo" aria-label="Gyan AI">G</div>
+      <h1 class="splash-title">Gyan AI</h1>
+      <p class="splash-company">STRATISSOFT</p>
+      <div class="splash-loader" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
+
+  <!-- ========== AUTH: SIGN UP / DETAILS ========== -->
+  <div class="auth-wrap hidden" id="step2">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-logo">G</div>
+        <div class="auth-brand-text">
+          <strong>Gyan AI</strong>
+          <span>STRATIC SOFT • AI INFRASTRUCTURE</span>
+        </div>
+      </div>
+      <h1 class="auth-title">अपनी जानकारी भरें</h1>
+      <p class="auth-sub">आगे बढ़ने के लिए अपना नाम, ईमेल, मोबाइल नंबर और पता भरें।</p>
+      <form id="detailsForm" class="auth-form" autocomplete="off">
+        <input type="email" id="detailEmail" class="auth-input" required placeholder="ईमेल एड्रेस" maxlength="160">
+                <input type="tel" id="detailPhone" class="auth-input" required placeholder="मोबाइल नंबर" maxlength="20">
+        <input type="text" id="detailUsername" class="auth-input" required placeholder="आपका पूरा नाम" maxlength="80">
+        <input type="text" id="detailAddress" class="auth-input" required placeholder="आपका पता" maxlength="200">
+        <button type="submit" class="btn-auth-primary">आगे बढ़ें</button>
+      </form>
+      
+      <div id="detailsStatus" class="status"></div>
+    </div>
+  </div>
+
+  <!-- ========== CREATE AI ========== -->
+  <div class="auth-wrap hidden" id="step3">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-logo">G</div>
+        <div class="auth-brand-text">
+          <strong>Gyan AI</strong>
+          <span>STRATIC SOFT • AI INFRASTRUCTURE</span>
+        </div>
+      </div>
+      <h1 class="auth-title">Create your AI</h1>
+      <p class="auth-sub">Type below and press Create.</p>
+      <form id="searchForm" class="auth-form" autocomplete="off">
+        <input type="text" id="searchInput" class="auth-input" placeholder="Create your AI" maxlength="100" autofocus>
+        <button type="submit" class="btn-auth-primary" id="searchBtn">Create</button>
+      </form>
+      <div id="searchStatus" class="status"></div>
+      <div id="thinkingBox" class="thinking-box hidden">
+        <div class="spinner"></div>
+        <p id="thinkText">Building your AI…</p>
+        <p class="tiny" id="thinkCountdown">Please wait ~5 minutes</p>
+        <div class="progress-bar"><div id="thinkProgress" class="progress-fill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SUCCESS ========== -->
+  <div class="auth-wrap hidden" id="step4">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-logo">G</div>
+        <div class="auth-brand-text">
+          <strong>Gyan AI</strong>
+          <span>STRATIC SOFT • AI INFRASTRUCTURE</span>
+        </div>
+      </div>
+      <div class="success-icon">✓</div>
+      <h1 class="auth-title">Your AI is ready!</h1>
+      <p class="auth-sub" id="successMsg">Open the link below. It is also saved in History.</p>
+      <div class="link-box">
+        <a id="aiLink" href="#" target="_blank" rel="noopener" class="ai-link"></a>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn-secondary" id="copyBtn">Copy Link</button>
+        <a id="openBtn" href="#" class="btn-auth-primary" style="text-decoration:none;text-align:center" target="_blank" rel="noopener">Open AI →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FORGOT: EMAIL ========== -->
+  <div class="auth-wrap hidden" id="forgotStep1">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-logo">G</div>
+        <div class="auth-brand-text">
+          <strong>Gyan AI</strong>
+          <span>STRATIC SOFT • AI INFRASTRUCTURE</span>
+        </div>
+      </div>
+      <h1 class="auth-title">Reset your password</h1>
+      <p class="auth-sub">Enter your email and we will send you a verification code.</p>
+      <input type="email" id="forgotEmail" class="auth-input" placeholder="Email address">
+      <button type="button" class="btn-auth-primary" id="sendCodeBtn">Send code</button>
+      <p class="auth-footer"><a href="#" id="backFromForgot">← Back to log in</a></p>
+      <div id="forgotStatus" class="status"></div>
+    </div>
+  </div>
+
+  <!-- ========== FORGOT: CODE ========== -->
+  <div class="auth-wrap hidden" id="forgotStep2">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-logo">G</div>
+        <div class="auth-brand-text">
+          <strong>Gyan AI</strong>
+          <span>STRATIC SOFT • AI INFRASTRUCTURE</span>
+        </div>
+      </div>
+      <h1 class="auth-title">Check your email</h1>
+      <p class="auth-sub" id="codeHint">We sent a 6-digit code. It expires in 15 minutes.</p>
+      <div class="otp-row" id="otpRow">
+        <input class="otp-box" maxlength="1" inputmode="numeric" data-i="0">
+        <input class="otp-box" maxlength="1" inputmode="numeric" data-i="1">
+        <input class="otp-box" maxlength="1" inputmode="numeric" data-i="2">
+        <input class="otp-box" maxlength="1" inputmode="numeric" data-i="3">
+        <input class="otp-box" maxlength="1" inputmode="numeric" data-i="4">
+        <input class="otp-box" maxlength="1" inputmode="numeric" data-i="5">
+      </div>
+      <button type="button" class="btn-auth-primary" id="verifyCodeBtn">Verify</button>
+      <p class="auth-footer"><a href="#" id="backFromCode">← Back to log in</a></p>
+      <div id="codeStatus" class="status"></div>
+    </div>
+  </div>
+
+  <!-- ========== FORGOT: NEW PASSWORD ========== -->
+  <div class="auth-wrap hidden" id="forgotStep3">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-logo">G</div>
+        <div class="auth-brand-text">
+          <strong>Gyan AI</strong>
+          <span>STRATIC SOFT • AI INFRASTRUCTURE</span>
+        </div>
+      </div>
+      <h1 class="auth-title">Create new password</h1>
+      <p class="auth-sub">Choose a new password for your account.</p>
+      <div class="auth-pass-wrap">
+        <input type="password" id="newPassword" class="auth-input" placeholder="New password" maxlength="80">
+        <button type="button" class="pass-toggle" id="togglePass2">👁</button>
+      </div>
+      <input type="password" id="confirmPassword" class="auth-input" placeholder="Confirm new password" maxlength="80">
+      <p class="hint-tiny" id="passMatchHint">Use at least 6 characters.</p>
+      <button type="button" class="btn-auth-primary" id="resetPassBtn">Save new password</button>
+      <div id="resetStatus" class="status"></div>
+    </div>
+  </div>
+
+  <!-- Top menu for history after login / always available -->
+  <header class="land-top">
+    <div class="logo-mini"><span class="auth-logo mini">G</span> Gyan AI</div>
+    <div class="land-top-right">
+      <div class="user-chip hidden" id="userChip" title="Profile">
+        <span class="user-avatar" id="userAvatar">G</span>
+      </div>
+      <div id="profileMenu" class="more-menu profile-menu hidden">
+        <div class="profile-email" id="profileEmail"></div>
+        <button type="button" id="profileHistoryBtn">🔗 History Links</button>
+        <button type="button" id="logoutBtn">↩ Log out</button>
+      </div>
+      <button type="button" id="landMoreBtn" class="icon-btn" aria-label="Menu">⋮</button>
+      <div id="landMoreMenu" class="more-menu hidden">
+        <button type="button" id="landHistoryBtn">🔗 History Links</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="linkHistoryPanel" class="settings-panel hidden">
+    <div class="settings-head">
+      <strong>🔗 History Links</strong>
+      <button type="button" id="closeLinkHistory" class="icon-btn">✕</button>
+    </div>
+    <div class="settings-body">
+      <p class="hint-tiny">Your saved AI links — permanent until you clear browser data.</p>
+      <div id="linkHistoryList"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+  <script src="/public/app.js"></script>
+</body>
+</html>
